@@ -158,6 +158,6 @@ WHERE array_length(genres, 1) = 2;
 
 -- FS4.
 
-SELECT *
+SELECT * 
 FROM analytics
 WHERE genres @> '{"Education"}';
