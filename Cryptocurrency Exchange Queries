@@ -1,0 +1,48 @@
+ SELECT *
+ FROM transactions
+ LIMIT 12;
+
+ --- The column names are id, user_id, date, currency, money_in, money_out
+
+SELECT SUM(money_in) as 'Total Money In'
+FROM transactions;
+
+--- Getting the Total Money In
+
+SELECT SUM(money_out) as 'Total Money Out'
+FROM transactions;
+
+--- Calculate the Total Money out
+
+SELECT COUNT(*) AS 'Total Money In Transactions'
+FROM transactions
+WHERE money_in IS NOT NULL;
+
+--- Total of all transactions that have money coming in - 43
+
+SELECT COUNT(*) AS 'BTC Money In Trasactions'
+FROM transactions
+WHERE money_in IS NOT NULL AND currency = 'BIT';
+
+--- Getting the total BTC Money In Transactions - 21
+
+SELECT MAX(money_in) AS 'Max Money In Transation', MAX(money_out) AS 'Max Money Out Transaction'
+FROM transactions;
+
+--- The largest transaction in this database is 15,047 as a Money Out transaction
+
+SELECT ROUND(AVG(money_in), 2) AS 'Average ETH transaction'
+FROM transactions
+WHERE currency = 'ETH' AND money_in IS NOT NULL;
+
+--- Getting the average money in for Ethereum transactions
+
+SELECT 
+    date AS 'Date', 
+    ROUND(AVG(money_in), 2) AS 'Average Money In',
+    ROUND(AVG(money_out), 2) AS 'Average Money Out'
+FROM transactions
+GROUP BY date;
+
+--- Grouping by date I am finding the average money in and money out for each date. 
+
