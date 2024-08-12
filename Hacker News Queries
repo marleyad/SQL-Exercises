@@ -1,0 +1,67 @@
+ SELECT title, score, url
+ FROM hacker_news
+ ORDER BY score DESC
+ LIMIT 20;
+
+--- Look at the most popular articles by score
+
+SELECT SUM(score)
+FROM hacker_news;
+
+--- Finding the total score of all the stories - 6366
+
+SELECT user, SUM(score)
+FROM hacker_news
+GROUP BY user
+HAVING SUM(score) > 200
+ORDER BY 2 DESC;
+
+--- Looking for users who have combined scores of over 200
+
+SELECT ROUND((517 + 309 + 304 + 282) / 6366.0, 3) * 100;
+
+--- Add the Scores of users who have combined scores of over 200 together. Round answer to 3 places and multiply by 100 for a percentage amount
+
+SELECT user,COUNT(*) AS 'Count'
+FROM hacker_news
+WHERE url LIKE '%watch?v=dQw4w9WgXcQ%'
+GROUP BY user
+ORDER BY COUNT(*) DESC;
+
+--- See how many have been rickrolled
+
+SELECT CASE
+  WHEN url LIKE '%github.com%' THEN 'GitHub'
+  WHEN url LIKE '%medium%' THEN 'Medium'
+  WHEN url LIKE '%nytimes.com%' THEN 'New York Times'
+  ELSE 'Other Source'
+  END AS 'Web Source', COUNT(*)
+FROM hacker_news
+GROUP BY 1
+ORDER BY COUNT(*) DESC;
+
+--- Categorize based on 3 websites using CASE, 
+
+SELECT timestamp
+FROM hacker_news
+LIMIt 10;
+
+--- Look into timestamp column
+
+SELECT timestamp, strftime('%H', timestamp)
+FROM hacker_news
+GROUP BY 1
+LIMIT 20;
+
+--- Exploring the strftime() function
+
+SELECT strftime('%H', timestamp) AS 'Hour', 
+  ROUND(AVG(score), 2) AS 'Average Score',
+  COUNT(*) AS 'Count'
+FROM hacker_news
+WHERE timestamp IS NOT NULL
+GROUP BY 1
+ORDER BY 2 DESC;
+
+
+--- Query with 3 columns - Each hour, the average score of each hour, and the count of each hour. 
