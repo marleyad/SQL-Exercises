@@ -1,0 +1,66 @@
+SELECT *
+FROM trips;
+
+SELECT *
+FROM riders;
+
+SELECT *
+FROM cars;
+
+--- Looking at the databases, Primary key for each is 'id'
+
+SELECT *
+FROM riders
+CROSS JOIN cars
+
+--- Cross Joining but it is not very useful information
+
+SELECT *
+FROM trips
+LEFT JOIN cars
+ON trips.car_id = cars.id;
+
+--- Left Joining the cars table to the trips table
+
+SELECT *
+FROM trips
+JOIN cars
+ON trips.car_id = cars.id;
+
+--- Inner Joining the cars with the trips table
+
+SELECT *
+FROM riders
+UNION
+SELECT *
+FROM riders2;
+
+--- Combining two tables into 1
+
+SELECT ROUND(AVG(cost), 2) AS 'Average Trip Cost'
+FROM trips;
+
+--- Calculating the average trip cost
+
+SELECT *
+FROM riders
+WHERE total_trips < 500
+UNION
+SELECT *
+FROM riders2
+WHERE total_trips < 500
+
+--- Seeing all the drivers who have used Lyft less than 500 times
+
+SELECT COUNT(*) AS 'Active Status Cars Total'
+FROM cars
+WHERE status = 'active';
+
+--- Looking up how many cars have active status
+
+SELECT *
+FROM CARS
+ORDER BY trips_completed DESC
+LIMIT 2;
+
+--- Seeing which 2 cars have the highest trips completed.
