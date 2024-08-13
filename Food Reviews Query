@@ -1,0 +1,67 @@
+
+SELECT * 
+FROM places;
+
+SELECT *
+FROM reviews;
+
+--- Getting an overview of the tables
+
+SELECT *
+FROM places
+WHERE price_point = '$' OR price_point = '$$';
+
+--- Finding places that cost $20 or less. $ = 10
+
+SELECT places.name, places.average_rating, reviews.username, reviews.rating, reviews.review_date, reviews.note
+FROM places
+JOIN reviews
+ON places.id = reviews.place_id;
+
+
+--- Joining places and reviews with inner join with selected columns
+
+SELECT places.name, places.average_rating, reviews.username, reviews.rating, reviews.review_date, reviews.note
+FROM places
+LEFT JOIN reviews
+ON places.id = reviews.place_id;
+
+--- Left joining while still selecting the same columns
+
+SELECT *
+FROM places
+LEFT JOIN reviews
+ON places.id = reviews.place_id
+WHERE reviews.note IS NULL;
+
+--- Find places without reviews in the data set. Although there were other columns to use, I picked reviews.note to verify a no-review place
+
+WITH reviews_from_2020 AS (
+  SELECT *
+  FROM reviews
+  WHERE strftime('%Y', review_date) = '2020'
+)
+
+SELECT *
+FROM reviews_from_2020
+JOIN places
+ON reviews_from_2020.place_id = places.id
+ORDER BY reviews_from_2020.id;
+
+--- Using a WITH clause to get all reviews from the year 2020 and then joining that data set to places
+
+SELECT ROUND(AVG(rating), 2) AS 'Average Rating'
+FROM reviews;
+
+-- Average Rating is 3.34
+
+SELECT username, ROUND(AVG(rating), 2) AS 'Average Rating', COUNT(*) AS 'Review Count'
+FROM reviews
+GROUP BY username
+HAVING ROUND(AVG(rating), 2) <= 3.34
+ORDER BY 2 DESC;
+
+--- I want to find the reviewer that has the most reviews that are below the average rating. 
+--- First, I find the average rating for places = 3.34
+--- Second, I use that number to filter out reviews higher than 3.34
+--- Third, for good measure, I added a Review Count to each Username to see how many reviews that have done.
