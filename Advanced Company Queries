@@ -1,0 +1,174 @@
+SELECT *
+FROM employees
+LIMIT 7;
+
+SELECT *
+FROM projects
+LIMIT 7;
+
+--- Familiarize myself with the two tables
+
+SELECT first_name
+FROM employees
+WHERE current_project IS NULL;
+
+--- Get the names of employees who are not working on a project currently. 36 Names appear
+
+SELECT project_id AS 'ID', project_name AS 'Project Name'
+FROM projects
+WHERE project_id NOT IN (
+    SELECT current_project
+    FROM employees
+    WHERE current_project IS NOT NULL);
+
+--- Finding the names of the pojects that were not chosen by any employees. 
+
+SELECT project_name AS 'Project Name', 
+    COUNT(*) AS 'Team Count'
+FROM projects
+JOIN employees
+ON projects.project_id = employees.current_project
+WHERE current_project IS NOT NULL
+GROUP BY project_name
+ORDER BY COUNT(employee_id) DESC
+LIMIT 1;
+
+--- Finding the project name of the project selected most by the employees
+
+SELECT project_name AS 'Project Name', 
+    COUNT(*) AS 'Team Count'
+FROM projects
+JOIN employees
+ON projects.project_id = employees.current_project
+WHERE current_project IS NOT NULL
+GROUP BY current_project
+HAVING COUNT(*) > 1
+ORDER BY COUNT(*) DESC;
+
+--- Seeing what projects have multiple people working on them
+
+SELECT project_name AS 'Project Name', 
+    COUNT(*) AS 'Team Count'
+FROM projects
+JOIN employees
+ON projects.project_id = employees.current_project
+GROUP BY current_project
+HAVING COUNT(*) <= 1
+ORDER BY COUNT(*) DESC;
+
+-- Each project needs 2 developers. Let me see how many developers there are with only 1 or no people working on them. There are 4 projects with just one team member working on them: MMA2K, BravoBoxing, ZombieStorm, and AlienInvasion. 
+
+SELECT COUNT(*) AS 'Total Employees'
+FROM employees;
+
+--- Right now the company has 50 employees. That means that there can be 25 projects handled(50 / 2 = 25)
+
+SELECT COUNT(*) AS 'Employees with no current project'
+FROM employees
+WHERE current_project IS NULL;
+
+--- The current number of employees without a project are 36. Meaning these employees could be handling about 18 projects which is much more than the 10 available projects.
+
+SELECT personality AS 'Personality Type', COUNT(*) AS 'Count'
+FROM employees
+GROUP BY personality
+ORDER BY COUNT(*) DESC
+LIMIT 3;
+
+--- The company focuses on collaboration in teams with being informed by their personality. I am making a query to find the most common personality type in the company. The top three personality types are: ENFJ, ISTP, ISFP.
+
+SELECT project_name AS 'Projects ENFJs are working on'
+FROM projects
+INNER JOIN employees
+ON projects.project_id = employees.current_project
+WHERE personality = 'ENFJ';
+
+--- What are the project names chosen by the employees with ENFJ(Most common personality type)? RocketRush, BravoBoxing, AlienInvasion
+
+SELECT first_name AS 'First Name', 
+    personality AS 'Personality Type',
+    CASE
+    WHEN personality = 'INFP'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN ('ISFP', 'ESFP', 'ISTP', 'ESTP', 'ISFJ', 'ESFJ', 'ISTJ', 'ESTJ'))
+    WHEN personality = 'ENFP'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          "ISFP", "ESFP", "ISTP", "ESTP", "ISFJ", "ESFJ", "ISTJ", "ESTJ"
+        ))
+    WHEN personality = 'INFJ'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          "ISFP", "ESFP", "ISTP", "ESTP", "ISFJ", "ESFJ", "ISTJ", "ESTJ"
+        ))
+    WHEN personality = 'ENFJ'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          "ESFP", "ISTP", "ESTP", "ISFJ", "ESFJ", "ISTJ", "ESTJ"
+        ))
+    WHEN personality = 'ISFP'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ'
+        ))
+    WHEN personality = 'ISFP'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ'
+        ))
+    WHEN personality = 'ESFP'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ', 'ENFJ'
+        ))
+    WHEN personality = 'ISTP'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ', 'ENFJ'
+        ))
+    WHEN personality = 'ESTP'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ', 'ENFJ'
+        ))
+    WHEN personality = 'ISFJ'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ', 'ENFJ'
+        ))
+    WHEN personality = 'ESFJ'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ', 'ENFJ'
+        ))
+    WHEN personality = 'ISTJ'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ', 'ENFJ'
+        ))
+    WHEN personality = 'ESTJ'
+    THEN (SELECT COUNT(*)
+        FROM employees
+        WHERE personality IN (
+          'INFP', 'ENFP', 'INFJ', 'ENFJ'
+        ))
+    ELSE 0
+    END AS 'Incompatables Count'
+FROM employees
+LEFT JOIN projects
+ON employees.current_project = projects.project_id
+ORDER BY 3 DESC;
+
+--- For every employee I got their first name, personality type, and then did a count for all the employees that would not be a good fit for their personality type. I ordered by the number of incompatible count descending. 
