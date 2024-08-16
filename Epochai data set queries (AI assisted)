@@ -1,0 +1,91 @@
+.tables
+
+--- Becoming familiar with the data tables in this problem.
+
+-- - AI prompts I made
+-- - I am looking at a database to investigate the rise of Generative AI systems, major organizations in Generative AI, and the Generative AI systems themselves
+
+-- - 3 SQL tables. SQL table 'problems' Columns:problem_id, domain, task. SQL table 'orgs' Columns: org_id, org_name, org_type. SQL table 'systems' Columns: publication_date, system, access, parameters, org_id, problem_id.
+
+SELECT s.system, o.org_name
+FROM systems s
+JOIN orgs o ON s.org_id = o.org_id;
+
+--- 1st generated prompt
+
+SELECT DISTINCT domain
+FROM problems;
+
+--- 2 generated prompt
+
+SELECT o.org_name, COUNT(s.system) AS num_systems
+FROM orgs o
+JOIN systems s ON o.org_id = s.org_id
+GROUP BY o.org_name;
+
+--- Prompt used for this: please write a SQL prompt to count the number of AI systems created by each organization. (It used the previous information from before as well to get the result)
+
+SELECT o.org_name, COUNT(s.system) AS num_systems
+FROM orgs o
+JOIN systems s ON o.org_id = s.org_id
+GROUP BY o.org_name
+ORDER BY COUNT(s.system) DESC
+LIMIT 10;
+
+--- I modified the code by ordering it by number of systems at the end and limiting the results to only 10. I thought the original code was good that the AI produced.
+
+SELECT o.org_name, o.org_type, COUNT(s.system) AS num_systems
+FROM orgs o
+JOIN systems s ON o.org_id = s.org_id
+GROUP BY o.org_name, o.org_type
+ORDER BY o.org_type;
+
+--- AI produced this code with this prompt: Now I would like you to use that prompt you just generated to sort based on organization type. I want to introduce a new column indicating the type of organization.
+
+SELECT o.org_name, o.org_type, COUNT(s.system) AS num_systems
+FROM orgs o
+JOIN systems s ON o.org_id = s.org_id
+WHERE org_name IS NOT NULL
+GROUP BY o.org_name, o.org_type
+ORDER BY o.org_type;
+
+--- I modified it by adding a WHERE clause so that it would not include null values for org_name.
+
+SELECT strftime('%Y', publication_date) AS year, COUNT(system) AS num_systems
+FROM systems
+GROUP BY year
+ORDER BY num_systems DESC
+LIMIT 10;
+
+--- This is the AI output when I input the prompt: I am using SQL light. I want a SQL query to count the number of AI systems in each year and also to report the maximum number 
+
+SELECT p.domain, COUNT(s.problem_id) AS num_problems
+FROM problems p
+LEFT JOIN systems s ON p.problem_id = s.problem_id
+GROUP BY p.domain
+HAVING num_problems IS NOT NULL
+ORDER BY num_problems DESC
+LIMIT 5;
+
+--- This is AI output when I input the prompt: Using SQLite again, I want to find the top 5 AI problems the organizations focus on. Please remove null values if they are relevant in this SQLite Query
+
+SELECT p.domain AS 'Domain', COUNT(s.problem_id) AS num_problems
+FROM problems p
+LEFT JOIN systems s ON p.problem_id = s.problem_id
+GROUP BY p.domain
+HAVING num_problems IS NOT NULL
+ORDER BY num_problems DESC
+LIMIT 20;
+
+-- - I modified the code above to add an alias and increase the limit. I am having trouble getting the 2nd column's name changed.
+
+SELECT p.domain AS 'Domain', 
+    COUNT(s.problem_id) AS "Number of problems"
+FROM problems p
+LEFT JOIN systems s ON p.problem_id = s.problem_id
+GROUP BY p.domain
+HAVING COUNT(s.problem_id) IS NOT NULL
+ORDER BY COUNT(s.problem_id) DESC
+LIMIT 12;
+
+--- I used AI to get the problem fixed. It fixed the problem by recommending the second alias should be coded as such in this code
