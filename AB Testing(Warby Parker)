@@ -1,0 +1,91 @@
+ SELECT *
+ FROM survey
+ LIMIT 12;
+
+ SELECT *
+ FROM home_try_on
+ LIMIT 12;
+
+ SELECT *
+ FROM purchase
+ LIMIT 12;
+
+ SELECT *
+ FROM quiz
+ LIMIT 12;
+
+ --- Look at the information and get a feel for the columns. In all, there are 4 tables: home_try_on, purchase, survey, and quiz.
+
+SELECT question As 'Question', 
+    COUNT(*) AS 'Count'
+FROM survey
+GROUP BY question;
+
+--- Putting the data I got from the previous query I learned that the lowest completion rate compared to the previous question is question number five: "When was your last eye exam?" Participants may not like this question because they may feel guilty it was a long time ago. 
+
+SELECT *
+FROM quiz
+LIMIT 5;
+
+SELECT *
+FROM home_try_on
+LIMIT 5;
+
+SELECT *
+FROM purchase
+LIMIT 5;
+
+--- Next, I will be conducting an analysis of A/B testing. It will look at if users during the home try-on stage prefer 3 pairs or 5 pairs of glasses when making a purchase. I look at the 3 tables that I will be using.
+
+SELECT q.user_id AS 'User',
+    home_try_on.user_id IS NOT NULL AS 'Home Try On',
+    number_of_pairs AS 'Number of Pairs',
+    purchase.user_id iS NOT NULL AS 'Purchased'
+FROM quiz q
+LEFT JOIN home_try_on
+   ON q.user_id = home_try_on.user_id
+LEFT JOIN purchase
+   ON purchase.user_id = q.user_id 
+LIMIT 10;
+
+--- I combine 3 tables with LEFT JOIN. I added columns (in addition to the user id) to see which of the users did the home_try_on, which number of pairs they had, and if they purchased or not. 
+
+WITH special_table AS (SELECT q.user_id AS "User",
+    home_try_on.user_id IS NOT NULL AS "Home Try On",
+    number_of_pairs AS "Number of Pairs",
+    purchase.user_id iS NOT NULL AS "Purchased"
+FROM quiz q
+LEFT JOIN home_try_on
+   ON q.user_id = home_try_on.user_id
+LEFT JOIN purchase
+   ON purchase.user_id = q.user_id)
+
+SELECT COUNT(*) AS 'Number of Users at Start'
+FROM special_table;
+
+--- I wrapped my previous query in a WITH clause to use for later. Then I found out that there were a total of 1000 users that we started with.
+
+SELECT COUNT(*)
+FROM special_table
+WHERE "Home Try On" = 1;
+
+--- Next, I look for the count of users who have a TRUE value for the Home Try On column. There were 750. 75% conversion.
+
+SELECT 
+    COUNT(CASE WHEN "Number of Pairs" = '3 pairs' THEN 1 END) AS 'Total Customers Who Got 3 pairs'
+FROM special_table;
+
+--- I found the total amount of people that got 3 pairs which is 379.
+
+SELECT "Number of Pairs", "Purchased", COUNT(*) AS 'Count'
+FROM special_table
+WHERE CAST("Number of Pairs" AS INTEGER) IN (3, 5)
+GROUP BY "Number of Pairs", "Purchased";
+
+--- I didn't want to create a separate query for every instance of 3 pairs purchased, 3 pairs not purchased, 5 pairs purchased, 5 pairs not purchased. With the table being confusing for me, I did use AI to help with this step. Even when it gave me code I had to troubleshoot it because it didn't work. I learned that I needed to use CASE for the Number of Pairs row to select them with "IN (3, 5). The resulting table is helpful"
+
+--- Results from Table: 3 pairs not purchased: 178; 3 pairs purchased: 201; 5 pairs not purchased: 77; 5 pairs purchased 294;
+
+--- Interpreting the results: Using the 3 pairs approached customers purchased 53% of the time. Using the 5 pairs approach, customers purchased 79% of the time. If the company wanted to increase the purchase rate (while not considering other factors such as shipping and packaging) a recommended course of action would be to use the 5-pair approach.
+--- 
+
