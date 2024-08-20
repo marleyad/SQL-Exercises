@@ -1,0 +1,106 @@
+SELECT *
+FROM subscriptions
+LIMIT 12;
+
+-- Looking at the table to familiarize myself with the columns and data
+
+SELECT COUNT(*) as active_users
+FROM subscriptions
+WHERE subscription_end IS NULL;
+
+-- There are 1380 users that the subscrption_end value is NULL meaning that they are still active. 
+
+SELECT COUNT(*) as cancelled_users
+FROM subscriptions
+WHERE subscription_end IS NOT NULL;
+
+-- There are 620 users that have a valid data for their subsription end date. They are no longer active users and cancelled their 
+
+SELECT COUNT(*) as total_users
+FROM subscriptions;
+
+--- Checking how many users there are total that are tracked in this table. The total amount is 2000. This makes sense 1380 + 620. 
+
+SELECT 
+    MIN(subscription_start) as earliest_start,
+    MAX(subscription_start) as lastest_start,
+    MIN(subscription_end) as earliest_end,
+    MAX(subscription_end) as lastest_end
+FROM subscriptions;
+
+--- I look at the time range in this table and list the max and min start and end dates for the users. The earliest date in the table is 2016-12-01. The latest date in the table is 2017-03-31
+
+WITH months AS
+(
+  SELECT 
+      '2017-01-01' as first_day,
+      '2017-01-31' as last_day
+  UNION 
+  SELECT
+      '2017-02-01' as first_day,
+      '2017-02-28' as last_day
+  UNION
+  SELECT
+      '2017-03-01' as first_day,
+      '2017-03-31' as last_day
+),
+-- I plan on calculating the churn rate for segments 87 and 30. My first step is making a temporary table of months as coded above.
+
+cross_join AS
+(
+  SELECT *
+  FROM subscriptions
+  CROSS JOIN months
+), 
+
+--- I cross join the subscriptions and months table together. I had trouble doing this and needed to use AI to help troubleshoot the problem. The main issue was that I wasn't joining the secondary table 'cross_join' to the first WITH statment'
+
+status AS
+(
+  SELECT id, 
+  first_day as month,
+  CASE 
+  WHEN (segment = 87) 
+    THEN 1
+    ELSE 0
+  END AS is_active_87,
+  CASE
+    WHEN (segment = 30)
+      THEN 1
+      ELSE 0
+    END AS is_active_30,
+  CASE
+    WHEN (segment = 87)
+      AND (subscription_end BETWEEN first_day AND last_day)
+    THEN 1
+    ELSE 0 
+  END AS is_canceled_87,
+  CASE
+    WHEN (segment = 30)
+      AND (subscription_end BETWEEN first_day AND last_day)
+    THEN 1
+    ELSE 0 
+  END AS is_canceled_30
+  FROM cross_join
+),
+
+--- Next I am creating a temporary table called status. I am calling the columns id and month. Then I am creating 2 new columns with the Case statement indicating if the user is active for either 87 or 30. If it is True it is marked as a 1 if it is False it is marked with a 0. 
+
+status_aggregate AS (
+  SELECT 
+      SUM(is_active_87) as sum_active_87,
+      SUM(is_active_30) as sum_active_30,
+      SUM(is_canceled_87) as sum_canceled_87,
+      SUM(is_canceled_30) as sum_canceled_30
+  FROM status
+  GROUP BY month
+)
+
+--- I created another temporary table. Each column calculates a different sum related to the segments 87 and 30. 
+
+SELECT 
+    ROUND(1.0 * sum_canceled_87 / sum_active_87, 3) * 100 AS '87 - % Churn by Month',
+    ROUND(1.0 * sum_canceled_30 / sum_active_30, 3) * 100 AS '30 - % Churn by Month'
+FROM status_aggregate;
+
+--- Finally I calculate the churn rate for segment 87 and 30. I take the canceled portion and divide it by the active portion. The churn rate for the 87 segment was 7, 14.8, 25.8 percent. The churn rate for the 30 segment was 2.2, 3.8, 8.4 percent. 
