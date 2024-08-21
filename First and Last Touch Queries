@@ -1,0 +1,83 @@
+SELECT * 
+FROM page_visits
+LIMIT 20;
+
+--- Look at the table and know the columns. In all, there are a total of over 5,000 rows to this table.
+
+SELECT COUNT(DISTINCT utm_campaign) AS 'Number of utm_campaigns'
+FROM page_visits;
+
+--- There are 8 distinct utm_campaigns. I tried a few ways of coding it myself but used AI to get the most efficient SQL listed above
+
+SELECT COUNT(DISTINCT utm_source) AS 'Number of utm_sources'
+FROM page_visits;
+
+-- - Using the same style of code above I get the number of utm_sources in this table. 
+
+SELECT DISTINCT page_name
+FROM page_visits;
+
+--- In all, there are 4 different pages for the website: landing_page, shopping_cart, checkout, purchase
+
+WITH first_touch AS (
+    SELECT user_id,
+        MIN(timestamp) as first_touch_at
+    FROM page_visits
+    GROUP BY user_id)
+
+SELECT
+    pv.utm_campaign AS 'Campaign',
+    COUNT(*) AS 'First Touch Count'
+FROM first_touch ft
+JOIN page_visits pv
+    ON ft.user_id = pv.user_id
+    AND ft.first_touch_at = pv.timestamp
+GROUP BY pv.utm_campaign
+ORDER BY COUNT(*) DESC;
+
+--- Next I find how many first touches each campaign is responsible for. The website provided a template of the query for first touches. I modified it to group by utm_campaign and to find the count of each campaign. 
+
+
+WITH last_touch AS (
+    SELECT user_id,
+        MAX(timestamp) as last_touch_at
+    FROM page_visits
+    GROUP BY user_id)
+
+SELECT
+    pv.utm_campaign AS 'Campaign',
+    COUNT(*) AS 'Last Touch Count'
+FROM last_touch lt
+JOIN page_visits pv
+    ON lt.user_id = pv.user_id
+    AND lt.last_touch_at = pv.timestamp
+GROUP BY pv.utm_campaign;
+
+--- I modified the code before this code block to find the number of last touches each campaign is responsible for.
+
+SELECT COUNT(DISTINCT user_id) AS 'Total Number of Purchases'
+FROM page_visits
+WHERE page_name = '4 - purchase';
+
+--- I check how many visitors made a purchase / who visited the page named 'purchase'. The number is 361
+
+WITH last_touch AS (
+    SELECT user_id,
+        MAX(timestamp) as last_touch_at
+    FROM page_visits
+    GROUP BY user_id)
+
+SELECT
+    pv.utm_campaign AS 'Campaign',
+    COUNT(*) AS 'Last Touch Count with Purchase'
+FROM last_touch lt
+JOIN page_visits pv
+    ON lt.user_id = pv.user_id
+    AND lt.last_touch_at = pv.timestamp
+WHERE page_name = '4 - purchase'
+GROUP BY pv.utm_campaign
+ORDER BY COUNT(*) DESC;
+
+-- - Now I look at the times each campaign has had a last touch AND had a purchase from it. I order the count descending starting with the highest count which belongs to the weekly-newsletter campaign at 114 last touches with purchase.
+
+--- Recommendation for Last Touch campaigns: They should continue weekly-newsletter, retargeting-ad because they both were over 100. They should not continue campaigns: interview-with-cool-tshirts-founder or cool-tshirts-search based on their last touch performance. They both were under 10 for last touches with purchases. 
