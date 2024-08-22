@@ -1,0 +1,139 @@
+SELECT *
+FROM state_climate
+LIMIT 10;
+
+-- Get to know the columns and the data. Columns are state, year, tempf (Fahrenheit), tempc(Celsius). I used tempf(Fahrenheit for my data queries)
+
+SELECT 
+  state,
+  year,
+  ROUND(tempf, 2) AS 'Temp in Fahrenheit',
+  ROUND(AVG(tempf) OVER (
+  PARTITION BY state
+  ORDER BY year),2) AS running_avg_temp
+FROM state_climate;
+
+-- I use a window function to get the average running temp for each state year by year.
+
+SELECT 
+  state,
+  year,
+  ROUND(tempf, 2) AS temp_fahrenheit,
+  ROUND(MIN(tempf) OVER (
+    PARTITION BY state
+  ), 2) AS lowest_temp
+FROM state_climate;
+
+-- I get the minimum temperature for each state across all years. I was confused with the different ways of setting up this window function. I did use ChatGPT to clarify what the different ways to set up this window function. I settlted for finding the minimum temperature across all years per state as opposed to finding the minimum temperature up to each year. The code works and gives 60.68 as the min temp for Alabama in all rows and continues that pattern for each state. 
+
+WITH temp_data AS (
+  SELECT 
+    state,
+    year,
+    ROUND(tempf, 2) AS temp_fahrenheit,
+    ROUND(MIN(tempf) OVER (PARTITION BY state ORDER BY year), 2) AS lowest_temp
+  FROM state_climate
+)
+
+SELECT 
+  state,
+  year,
+  temp_fahrenheit,
+  lowest_temp
+FROM temp_data
+WHERE temp_fahrenheit = lowest_temp;
+
+-- I had a tough time trying to just get the rows of temp_fahrenheit and lowest_temp that matched. I asked ChatGPT why my approach wouldn't work and it said that I needed a Common Table Expression to execute this query if I am using SQLite. The code above works and shows the rows that match the values of temp_fahrenheit and lowest_temp.'
+
+SELECT 
+  state,
+  year,
+  ROUND(tempf, 2) AS temp_fahrenheit,
+  ROUND(LAST_VALUE(tempf) OVER (
+    PARTITION BY state
+    RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ), 2) AS hightest_temp
+FROM state_climate;
+
+-- Next I look at the highest temperature from each state. I had to look up a Youtube Video to check out how the LAST_VALUE works with the RANGE. I did trouble shooting with ChatGPT.
+
+SELECT 
+  state,
+  year,
+  ROUND(tempf, 2) AS temp_fahrenheit,
+  ROUND(tempf - LAG(tempf, 1, tempf) OVER (
+    PARTITION BY state
+  ),2) AS change_in_temp
+FROM state_climate;
+
+-- I use LAG with OVER to create a window function to get the temperature change over the years Partitioned by each state.
+
+SELECT 
+  state,
+  year,
+  ROUND(tempf, 2) AS temp_fahrenheit,
+  ABS(ROUND(tempf - LAG(tempf, 1, tempf) OVER (
+    PARTITION BY state
+  ),2)) AS change_in_temp
+FROM state_climate
+ORDER BY change_in_temp DESC;
+
+-- I modify the search here to get the absolute value for the change in temp. This way a change in negative is counted just as much as a positive change. I also added a ORDER BY clause to organize the data to show the highest change of temps at the top. Minnesota in 2013 had the highest temp change with a 5.88 degree change.
+
+SELECT 
+  state,
+  year,
+  ROUND(tempf, 2) AS temp_fahrenheit,
+  RANK() OVER (
+    ORDER BY ROUND(tempf, 2) ASC
+  ) AS coldest_rank
+FROM state_climate;
+
+-- Next I rank all rows by creating a new column, cold_rank. This rank does not partition by state. It is for any state and any year. The top result is North Dakota in 1950 with 34.9 degrees.
+
+SELECT 
+  state,
+  year,
+  ROUND(tempf, 2) AS temp_fahrenheit,
+  RANK() OVER (
+    PARTITION BY state
+    ORDER BY ROUND(tempf, 2) DESC
+  ) AS warmest_rank
+FROM state_climate;
+
+-- This query finds the warmest year WITHIN state results and ranks them. At the top of the results is Alabama 1921. Alabama's warmest year is 1921 at 65.7 degrees'
+
+
+SELECT 
+  NTILE(4) OVER (
+    PARTITION BY state
+    ORDER BY ROUND(tempf, 2) ASC
+  ) AS coldest,
+  year,
+  state,
+  ROUND(tempf, 2) AS temp_fahrenheit
+FROM state_climate;
+
+-- I use the NTILE () function to get the average yearly temperatures into quartiles. I partition by state. Looking through the data it seems that the coldest temperatures (1st quartile) are earlier and the warmer temperatures are more recent (4th quartile)
+
+SELECT 
+  NTILE(5) OVER (
+    ORDER BY ROUND(tempf, 2) ASC
+  ) AS coldest,
+  year,
+  state,
+  ROUND(tempf, 2) AS temp_fahrenheit
+FROM state_climate;
+
+-- I write a query to get the average yearly temperatures in quintiles. I am not partitioning by state so the quintiles will look at the overall year,state pairs not paritioned by year or state. Looking through the coldest quintile(1) I saw a lot of Northern states which fits the data.
+
+SELECT 
+  NTILE(1000) OVER (
+    ORDER BY ROUND(tempf, 2) ASC
+  ) AS coldest,
+  year,
+  state,
+  ROUND(tempf, 2) AS temp_fahrenheit
+FROM state_climate;
+
+-- I wanted to know what was the coldest 1/1000 of the data. The query returned 4 years in North Dakota and 1 year in Minnesota. All temperatures were below 36.3
