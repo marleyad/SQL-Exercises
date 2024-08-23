@@ -1,0 +1,89 @@
+.tables
+
+SELECT *
+FROM stream
+LIMIT 5;
+
+SELECT *
+FROM chat
+LIMIT 5;
+
+-- I look at the data and see what columns that it has.
+
+SELECT DISTINCT game
+FROM stream
+WHERE game IS NOT NULL;
+
+-- Checking what are the games in the stream table
+
+SELECT DISTINCT channel
+FROM stream
+WHERE channel IS NOT NULL;
+
+-- Checking what are the different channels in stream table
+
+SELECT game, COUNT(*) as count
+FROM stream
+WHERE game IS NOT NULL
+GROUP BY game
+ORDER BY COUNT(*) DESC;
+
+-- The most popular games in the streams table are: League of Legends at 1,070, Dota 2 at 472, Counter_strike: Global Offensive 302.
+
+SELECT country, COUNT(*) as count
+FROM stream
+WHERE country IS NOT NULL
+GROUP BY country
+ORDER BY COUNT(*) DESC;
+
+-- Looking more into where the views are coming from I find out that the 3 biggest countries that like League of Legends are US, TW, DE.
+
+SELECT player, COUNT(*)
+FROM stream
+GROUP BY player
+ORDER BY COUNT(*) DESC;
+
+-- I take a look at what the player (devices that acces the content) are. Top 3 players are site 1365, iphone_t 622, and android 547.
+
+SELECT
+  game,
+  CASE
+    WHEN (game = 'League of Legends') THEN 'MOBA'
+    WHEN (game = 'Dota 2') THEN 'MOBA'
+    WHEN (game = 'Heroes of the Storm') THEN 'MOBA'
+    WHEN (game = 'Counter-Strike: Global Offensive') THEN 'FPS'
+    WHEN (game = 'DayZ') THEN 'Survial'
+    WHEN (game = 'ARK: Survival Evolved') THEN 'Survival'
+    ELSE 'Other'
+  END AS genre,
+  COUNT(*) as count
+  FROM stream
+  WHERE game NOT NULL
+  GROUP BY game
+  ORDER BY COUNT(*) DESC;
+
+  -- Next I assigned genre's based on the title of the games. Multiplayer Online Battle Arena (MOBA), First Person Shooter (FPS), Survival, and Other'. I also assgined a count column very similar to the one I did about 4 queries ago.
+
+SELECT time
+FROM stream
+LIMIT 5;
+
+-- It looks like for the time column that it has a DATETIME type.
+
+SELECT 
+  STRFTIME('%H', time) as hour, 
+  COUNT(*) as count
+FROM stream
+WHERE country = 'US'
+GROUP BY 1
+ORDER BY COUNT(*) DESC;
+
+-- I find out what are the popular times for users to log in for the United States. The most popular times are 6 pm, 7 pm, 8 pm, 9 pm with 9pm being the most popular.
+
+SELECT *
+FROM stream
+JOIN chat
+ON stream.device_id = chat.device_id
+LIMIT 40;
+
+-- If I want to do any additional queries in the future that relate to both the chat and the stream I can combine the two tables with a JOIN.
