@@ -2,7 +2,7 @@ SELECT *
 FROM subscriptions
 LIMIT 12;
 
--- Looking at the table to familiarize myself with the columns and data
+-- Looking at the table to familiarize myself with the columns
 
 SELECT COUNT(*) as active_users
 FROM subscriptions
