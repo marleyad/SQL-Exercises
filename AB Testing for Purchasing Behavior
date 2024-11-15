@@ -2,7 +2,7 @@
  FROM survey
  LIMIT 12;
 
- SELECT *
+ SELECT * 
  FROM home_try_on
  LIMIT 12;
 
