@@ -1,5 +1,5 @@
 SELECT *
-FROM state_climate
+FROM state_climate 
 LIMIT 10;
 
 -- Get to know the columns and the data. Columns are state, year, tempf (Fahrenheit), tempc(Celsius). I used tempf(Fahrenheit for my data queries)
