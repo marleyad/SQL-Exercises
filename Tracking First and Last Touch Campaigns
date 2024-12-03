@@ -1,5 +1,5 @@
 SELECT * 
-FROM page_visits
+FROM page_visits 
 LIMIT 20;
 
 --- Look at the table and know the columns. In all, there are a total of over 5,000 rows to this table.
