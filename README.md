@@ -1,6 +1,6 @@
 # SQL Project Summaries
 
-## AB Testing for Purchasing Behavior
+## AB Testing for Purchasing Behavior  
 **Summary:**  
 Analyzed user engagement and purchasing behavior for an eyewear company using SQL, focusing on survey completion rates and A/B testing for try-on options. The analysis identified a higher purchase rate for the 5-pair home try-on approach, providing actionable insights for sales strategies.
 
