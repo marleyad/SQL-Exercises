@@ -3,7 +3,7 @@ FROM employees
 LIMIT 7;
       
 SELECT *
-FROM projects  
+FROM projects    
 LIMIT 7;
 
 --- Familiarize myself with the two tables
