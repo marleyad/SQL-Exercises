@@ -1,5 +1,5 @@
  SELECT * 
- FROM survey 
+ FROM survey   
  LIMIT 12;
   
  SELECT * 
