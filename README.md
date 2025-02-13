@@ -4,7 +4,7 @@
 **Summary:**   
 Analyzed user engagement and purchasing behavior for an eyewear company using SQL, focusing on survey completion rates and A/B testing for try-on options. The analysis identified a higher purchase rate for the 5-pair home try-on approach, providing actionable insights for sales strategies.
 
-**Key SQL Skills:**
+**Key SQL Skills:**  
 - **Data Exploration and Aggregation:** Used `GROUP BY` and `COUNT` functions to analyze survey data and identify patterns in question completion rates.
 - **Data Integration:** Leveraged `LEFT JOIN` to combine data across multiple tables (`quiz`, `home_try_on`, `purchase`) to build a comprehensive dataset for A/B testing.
 - **Subqueries and CTEs:** Utilized `WITH` clauses for structuring complex queries and simplifying repeated logic.
