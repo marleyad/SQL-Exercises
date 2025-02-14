@@ -7,7 +7,7 @@
  LIMIT 12;  
 
  SELECT *
- FROM purchase
+ FROM purchase  
  LIMIT 12;
 
  SELECT *
