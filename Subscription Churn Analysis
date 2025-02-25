@@ -4,7 +4,7 @@ LIMIT 12;
   
 -- Looking at the table to familiarize myself with the columns  
 
-SELECT COUNT(*) as active_users     
+SELECT COUNT(*) as active_users       
 FROM subscriptions  
 WHERE subscription_end IS NULL;
 
