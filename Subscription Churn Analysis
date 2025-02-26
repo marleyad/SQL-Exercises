@@ -17,7 +17,7 @@ WHERE subscription_end IS NOT NULL;
 -- 620 users have valid data for their subscription end date. They are no longer active users and canceled their 
 
 SELECT COUNT(*) as total_users
-FROM subscriptions;
+FROM subscriptions;  
 
 --- Checking how many users there are in total that are tracked in this table. The total amount is 2000. This makes sense 1380 + 620. 
 
