@@ -1,6 +1,6 @@
 SELECT *
 FROM employees
-LIMIT 7;
+LIMIT 7; 
         
 SELECT *
 FROM projects      
