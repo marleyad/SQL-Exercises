@@ -5,7 +5,7 @@ LIMIT 7;
 SELECT *
 FROM projects      
 LIMIT 7; 
-   
+    
 --- Familiarize myself with the two tables
 
 SELECT first_name
