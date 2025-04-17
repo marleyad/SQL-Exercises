@@ -4,7 +4,7 @@
   
  SELECT * 
  FROM home_try_on
- LIMIT 12;  
+ LIMIT 12;   
 
  SELECT *
  FROM purchase  
