@@ -5,7 +5,7 @@ LIMIT 12;
 -- Looking at the table to familiarize myself with the columns  
  
 SELECT COUNT(*) as active_users       
-FROM subscriptions  
+FROM subscriptions   
 WHERE subscription_end IS NULL;  
 
 -- There are 1380 users whose subscrption_end value is NULL meaning that they are still active. 
