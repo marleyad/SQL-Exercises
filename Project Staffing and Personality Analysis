@@ -13,7 +13,7 @@ FROM employees
 WHERE current_project IS NULL;
 
 --- Get the names of employees who are not working on a project currently. 36 Names appear
-
+ 
 SELECT project_id AS 'ID', project_name AS 'Project Name'
 FROM projects
 WHERE project_id NOT IN (
