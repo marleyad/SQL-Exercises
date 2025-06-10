@@ -6,7 +6,7 @@ LIMIT 10;
 
 SELECT 
   state,
-  year,
+  year, 
   ROUND(tempf, 2) AS 'Temp in Fahrenheit', 
   ROUND(AVG(tempf) OVER (
   PARTITION BY state
