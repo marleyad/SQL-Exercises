@@ -7,7 +7,7 @@ LIMIT 10;
 SELECT 
   state,
   year, 
-  ROUND(tempf, 2) AS 'Temp in Fahrenheit', 
+  ROUND(tempf, 2) AS 'Temp in Fahrenheit',   
   ROUND(AVG(tempf) OVER (
   PARTITION BY state
   ORDER BY year),2) AS running_avg_temp
